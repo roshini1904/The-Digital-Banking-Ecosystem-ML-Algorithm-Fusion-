@@ -1156,4 +1156,6 @@ if __name__ == "__main__":
     print("  http://127.0.0.1:5000")
     print("  Logins: admin/Admin@123  |  customer/Customer@123")
     print("=" * 55 + "\n")
-    app.run(debug=True, port=5000)
+    if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=False, host="0.0.0.0", port=port)
