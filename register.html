@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureBank AI — Create Account</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --navy:    #0b1929;
+            --navy2:   #112240;
+            --cyan:    #00d4ff;
+            --cyan2:   #00a8cc;
+            --green:   #00e5a0;
+            --red:     #ff4f6a;
+            --text:    #e8f0fe;
+            --muted:   #8ca0bf;
+            --border:  rgba(0, 212, 255, 0.18);
+            --card-bg: rgba(17, 34, 64, 0.92);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--navy);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px; overflow: hidden; position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image:
+                linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none; z-index: 0;
+        }
+
+        .orb {
+            position: fixed; border-radius: 50%; filter: blur(80px);
+            pointer-events: none; z-index: 0; opacity: 0.35;
+            animation: float 8s ease-in-out infinite;
+        }
+        .orb-1 { width: 380px; height: 380px; background: radial-gradient(circle, #00d4ff44, transparent 70%); top: -80px; right: -80px; }
+        .orb-2 { width: 280px; height: 280px; background: radial-gradient(circle, #00e5a044, transparent 70%); bottom: -60px; left: -60px; animation-delay: -4s; }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+
+        .wrapper {
+            position: relative; z-index: 1;
+            width: 100%; max-width: 460px;
+        }
+
+        .brand {
+            text-align: center; margin-bottom: 28px;
+        }
+        .brand-icon {
+            width: 56px; height: 56px; margin: 0 auto 14px;
+            background: linear-gradient(135deg, var(--cyan), var(--green));
+            border-radius: 14px; display: flex; align-items: center; justify-content: center;
+            font-size: 26px; box-shadow: 0 0 28px rgba(0,212,255,0.4);
+        }
+        .brand h1 { font-size: 1.5rem; font-weight: 700; color: var(--text); letter-spacing: -0.4px; }
+        .brand span { color: var(--cyan); }
+        .brand p { color: var(--muted); font-size: 0.83rem; margin-top: 5px; }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px; padding: 32px 36px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+        }
+
+        .card h2 {
+            font-size: 1.05rem; font-weight: 600; color: var(--text);
+            margin-bottom: 22px; text-align: center;
+        }
+
+        /* Flash messages */
+        .alert {
+            padding: 10px 14px; border-radius: 8px;
+            font-size: 0.875rem; margin-bottom: 18px; text-align: center;
+            background: rgba(255,79,106,0.12);
+            border: 1px solid rgba(255,79,106,0.35);
+            color: #ff8fa0;
+        }
+        .alert.alert-success {
+            background: rgba(0,229,160,0.12);
+            border-color: rgba(0,229,160,0.35);
+            color: var(--green);
+        }
+
+        /* Row layout for side-by-side fields */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block; font-size: 0.78rem; font-weight: 500;
+            color: var(--muted); margin-bottom: 7px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .form-group input {
+            width: 100%; padding: 11px 13px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text);
+            font-family: 'Inter', sans-serif; font-size: 0.9rem;
+            transition: all 0.2s; outline: none;
+        }
+        .form-group input:focus {
+            border-color: var(--cyan);
+            background: rgba(0,212,255,0.06);
+            box-shadow: 0 0 0 3px rgba(0,212,255,0.12);
+        }
+        .form-group input::placeholder { color: #3a5a7a; }
+
+        /* Password strength bar */
+        .strength-bar-bg {
+            height: 4px; border-radius: 2px;
+            background: rgba(255,255,255,0.08);
+            margin-top: 8px; overflow: hidden;
+        }
+        .strength-bar {
+            height: 100%; border-radius: 2px;
+            width: 0%; transition: width 0.3s, background 0.3s;
+        }
+        .strength-label {
+            font-size: 0.72rem; margin-top: 5px;
+            color: var(--muted); min-height: 16px;
+        }
+
+        .btn {
+            width: 100%; padding: 12px;
+            background: linear-gradient(135deg, var(--cyan2), var(--cyan));
+            color: #0b1929; font-weight: 700; font-size: 0.95rem;
+            border: none; border-radius: 8px; cursor: pointer;
+            transition: all 0.2s; margin-top: 4px; letter-spacing: 0.3px;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(0,212,255,0.35);
+        }
+        .btn:active { transform: none; }
+
+        .divider {
+            display: flex; align-items: center; gap: 12px;
+            margin: 18px 0;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; height: 1px;
+            background: var(--border);
+        }
+        .divider span { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+
+        .login-link {
+            text-align: center; font-size: 0.85rem; color: var(--muted);
+        }
+        .login-link a {
+            color: var(--cyan); text-decoration: none; font-weight: 600;
+        }
+        .login-link a:hover { text-decoration: underline; }
+
+        .terms {
+            font-size: 0.73rem; color: #3a5070;
+            text-align: center; margin-top: 14px; line-height: 1.5;
+        }
+
+        footer {
+            text-align: center; margin-top: 22px;
+            color: #3a5070; font-size: 0.75rem;
+        }
+
+        @media (max-width: 480px) {
+            .form-row { grid-template-columns: 1fr; }
+            .card { padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="wrapper">
+    <div class="brand">
+        <div class="brand-icon">🏦</div>
+        <h1>Secure<span>Bank</span> AI</h1>
+        <p>Open your intelligent banking account today</p>
+    </div>
+
+    <div class="card">
+        <h2>Create Your Account</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert {% if category == 'success' %}alert-success{% endif %}">
+                {% if category == 'success' %}✅{% else %}⚠{% endif %} {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/register" id="regForm">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" placeholder="Jane Smith" required autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" placeholder="janesmith" required autocomplete="username"
+                           minlength="3" pattern="[a-zA-Z0-9_]+" title="Letters, numbers and underscores only">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" placeholder="jane@example.com" required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" id="pwdInput" placeholder="Min. 6 characters"
+                       required minlength="6" autocomplete="new-password">
+                <div class="strength-bar-bg"><div class="strength-bar" id="strengthBar"></div></div>
+                <div class="strength-label" id="strengthLabel"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" name="confirm_password" id="confirmInput"
+                       placeholder="Re-enter password" required autocomplete="new-password">
+            </div>
+
+            <button class="btn" type="submit">Create Account →</button>
+        </form>
+
+        <div class="divider"><span>already have an account?</span></div>
+        <div class="login-link"><a href="/login">← Sign in instead</a></div>
+
+        <p class="terms">By registering, you agree to use this system for educational and demo purposes only.</p>
+    </div>
+
+    <footer>MCA Capstone Project · SecureBank AI · 2025</footer>
+</div>
+
+<script>
+    // Password strength indicator
+    const pwdInput    = document.getElementById('pwdInput');
+    const bar         = document.getElementById('strengthBar');
+    const label       = document.getElementById('strengthLabel');
+    const confirmInput = document.getElementById('confirmInput');
+
+    const levels = [
+        { min: 0,  color: '#ff4f6a', width: '20%', text: 'Very weak' },
+        { min: 6,  color: '#ffc107', width: '40%', text: 'Weak' },
+        { min: 8,  color: '#fd9c00', width: '60%', text: 'Fair' },
+        { min: 10, color: '#00d4ff', width: '80%', text: 'Strong' },
+        { min: 12, color: '#00e5a0', width: '100%', text: 'Very strong' },
+    ];
+
+    function checkStrength(pwd) {
+        if (!pwd) { bar.style.width = '0'; label.textContent = ''; return; }
+        let score = pwd.length;
+        if (/[A-Z]/.test(pwd)) score += 2;
+        if (/[0-9]/.test(pwd)) score += 2;
+        if (/[^a-zA-Z0-9]/.test(pwd)) score += 3;
+
+        const level = [...levels].reverse().find(l => score >= l.min) || levels[0];
+        bar.style.width  = level.width;
+        bar.style.background = level.color;
+        label.textContent = level.text;
+        label.style.color = level.color;
+    }
+
+    pwdInput.addEventListener('input', () => checkStrength(pwdInput.value));
+
+    // Confirm password match feedback
+    confirmInput.addEventListener('input', () => {
+        if (confirmInput.value && confirmInput.value !== pwdInput.value) {
+            confirmInput.style.borderColor = '#ff4f6a';
+        } else {
+            confirmInput.style.borderColor = confirmInput.value ? '#00e5a0' : '';
+        }
+    });
+
+    // Client-side confirm check before submit
+    document.getElementById('regForm').addEventListener('submit', e => {
+        if (pwdInput.value !== confirmInput.value) {
+            e.preventDefault();
+            confirmInput.style.borderColor = '#ff4f6a';
+            confirmInput.focus();
+        }
+    });
+</script>
+</body>
+</html>
