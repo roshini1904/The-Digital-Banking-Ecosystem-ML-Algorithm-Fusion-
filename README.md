@@ -122,7 +122,7 @@ Digital Banking/
 ├── app.py ← Flask app + ML models
 ├── requirements.txt ← Dependencies
 ├── README.md ← This file
-templates
+└── templates/
 ├── login.html ← Login page
 ├── register.html ← Registration page
 ├── customer_dashboard.html ← Customer portal
