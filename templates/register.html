@@ -168,6 +168,32 @@
             text-align: center; margin-top: 14px; line-height: 1.5;
         }
 
+        /* Eye toggle for password */
+        .pwd-wrap {
+            position: relative;
+        }
+        .pwd-wrap input {
+            padding-right: 42px !important;
+        }
+        .eye-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 1rem;
+            padding: 4px;
+            line-height: 1;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .eye-btn:hover { color: var(--cyan); }
+
         footer {
             text-align: center; margin-top: 22px;
             color: #3a5070; font-size: 0.75rem;
@@ -224,16 +250,28 @@
 
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" id="pwdInput" placeholder="Min. 6 characters"
-                       required minlength="6" autocomplete="new-password">
+                <div class="pwd-wrap">
+                    <input type="password" name="password" id="pwdInput" placeholder="Min. 6 characters"
+                           required minlength="6" autocomplete="new-password">
+                    <button type="button" class="eye-btn" onclick="toggleEye('pwdInput','eyeIcon1')"
+                        title="Show/Hide Password">
+                        <span id="eyeIcon1">👁️</span>
+                    </button>
+                </div>
                 <div class="strength-bar-bg"><div class="strength-bar" id="strengthBar"></div></div>
                 <div class="strength-label" id="strengthLabel"></div>
             </div>
 
             <div class="form-group">
                 <label>Confirm Password</label>
-                <input type="password" name="confirm_password" id="confirmInput"
-                       placeholder="Re-enter password" required autocomplete="new-password">
+                <div class="pwd-wrap">
+                    <input type="password" name="confirm_password" id="confirmInput"
+                           placeholder="Re-enter password" required autocomplete="new-password">
+                    <button type="button" class="eye-btn" onclick="toggleEye('confirmInput','eyeIcon2')"
+                        title="Show/Hide Password">
+                        <span id="eyeIcon2">👁️</span>
+                    </button>
+                </div>
             </div>
 
             <button class="btn" type="submit">Create Account →</button>
@@ -249,6 +287,19 @@
 </div>
 
 <script>
+    // ── Eye toggle — show/hide password ──────────────────
+    function toggleEye(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon  = document.getElementById(iconId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.textContent = '🙈';   // Hide icon when visible
+        } else {
+            input.type = 'password';
+            icon.textContent = '👁️';   // Eye icon when hidden
+        }
+    }
+
     // Password strength indicator
     const pwdInput    = document.getElementById('pwdInput');
     const bar         = document.getElementById('strengthBar');
